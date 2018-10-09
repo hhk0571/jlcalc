@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% block heading %}
+<!-- page header -->
+{% endblock %}
+
+{% block body %}
+<div>
+    {{ descr }}
+</div>
+
+{% if errs %}
+<div class="alert alert-danger">
+    <h4>共发现 {{ errs|length }} 个错误, 请人工校对!</h4>
+    <ul>
+        {% for err in errs %}
+        <li>{{ err }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div>
+    <span class="label label-default">Debug info</span>
+    <code onclick="btn_click(this, 'debug_info')">[+]</code>
+    <div id="debug_info" style="display: none;">
+        <pre>
+            <code>
+{{ outputs }}
+            </code>
+        </pre>
+    </div>
+</div>
+
+<br>
+
+{% if order_table %}
+<div class='row'>
+    <div class='col-xs-12 col-md-3'>
+        <table class="table table-bordered table-condensed">
+            <tr>
+                {% for header in headers %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for elem in summary %}
+                <td>{{ elem }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-xs-12 col-md-6'>
+        <table class="table table-bordered table-condensed">
+            {% for order in order_table %}
+            {% if loop.first %}
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    {% for header in order_table[0] %}
+                    <th>{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            {% else %}
+            <tbody>
+                <tr>
+                    <td>{{ loop.index0 }}</td>
+                    {% for elem in order %}
+                    <td>{{ elem }}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+            {% endif %}
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<script>
+    function btn_click(self, id){
+        var content = document.getElementById(id); //获取content对象
+
+        if(self.innerHTML == '[-]') { //当前状态是展开的，需要收缩
+            content.style.display='none'
+            self.innerHTML='[+]'
+        } else { //当前状态是收缩的，需要展开
+            content.style.display='block'
+            self.innerHTML = '[-]';
+        }
+    }
+</script>
+
+{% endif %}
+
+{% endblock %}
