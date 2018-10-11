@@ -230,6 +230,7 @@ class OrdersParser(object):
         line_sum = np.c_[amount_array, np.sum(amount_array * self.price, axis=1)]
         summary = np.sum(line_sum, axis=0)
         summary = np.hstack((len(orders), summary))
+        summary = summary.tolist()
         print('-'*80, file=self.file)
         print('Summary:', file=self.file)
         summary_header = ['人数'] + headers[2:] + ['总金额']

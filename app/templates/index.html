@@ -6,45 +6,40 @@
 
 {% block body %}
 <form role="form" action="{{ url_for('orders') }}" method="post">
+    {{ form.hidden_tag() }}
     <div class="form-group">
-        <label>物品价格:</label>
-        <input type="number" step="0.1" name="price" placeholder="价格" len='5' required>
-        <button class="btn btn-primary">Submit</button>
+        {{ form.price.label }}
+        {{ form.price(size=10) }}
+        {{ form.submit(class="btn btn-primary") }}
     </div>
     <div class="form-group">
-        <label>物品分类:</label>
-        <label class="radio-inline">
-            <input type="radio" id="rd_single" name="mclass" value="False" checked onclick="mclass_click(this.value)"> 单分类
-        </label>
-        <label class="radio-inline">
-            <input type="radio" id="rd_multi" name="mclass" value="True" onclick="mclass_click(this.value)"> 多分类 
-        </label>
+        {{ form.mclass(onchange="mclass_change(this)") }}
+        {{ form.mclass.label }}
         <div id="classDiv" style="display: none;">
             <small>每个类别的标签单独一行, 标签之间用空格隔开</small>
-            <textarea class="form-control" id="classesTxt" name="classes" rows="4" placeholder="类别标签..."></textarea>
+            {{ form.classtxt(class="form-control", rows=4, placeholder="类别标签...") }}
         </div>
     </div>
-
     <div class="form-group">
-        <label for="orderTxt">接龙文本:</label>
-        <textarea class="form-control" id="orderTxt" name="order_txt" rows="25" placeholder="Enter Your Text" required></textarea>
+        {{ form.ordertxt.label }}
+        {{ form.ordertxt(class="form-control", rows=25, placeholder="Enter Your Text") }}
     </div>
-    <!-- <div class="form-group">
-        <button class="btn btn-primary">Submit</button>
-    </div> -->
 </form>
+
+
+
 <!-- 测试访问静态文件 -->
 <!-- <img src="{{ url_for('static', filename='img/sunyang.jpg') }}" /> -->
 <script>
-    function mclass_click(is_visible){
+    function mclass_change(obj){
         var classDiv = document.getElementById('classDiv');
-        var classesTxt = document.getElementById('classesTxt');
-        if (is_visible == 'True'){
+        var classtxt = document.getElementById('classtxt');
+        if (obj.checked){
             classDiv.style.display='block'
-            classesTxt.required = true
+            classtxt.required = true
         } else {
             classDiv.style.display='none'
-            classesTxt.required = false
+            classtxt.required = false
         }
     }
 </script>

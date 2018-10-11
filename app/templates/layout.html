@@ -4,8 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <title>My Website!</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <!-- <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"> -->
+        <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <!-- <script src="//apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script> -->
         <!-- <script src="//apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script> -->
         <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
@@ -26,10 +26,10 @@
         </footer>
         <script>
             function classDiv_visible() {
-                var rd_multi = document.getElementById('rd_multi')
+                var mclass = document.getElementById('mclass')
                 var classDiv = document.getElementById('classDiv');
                 
-                if (rd_multi != null && rd_multi.checked){
+                if (mclass != null && mclass.checked){
                     classDiv.style.display='block'
                 }
             }

@@ -1,28 +1,47 @@
 # coding: utf-8
 
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from app import app
-import app.calc_namelist as calc
-
+from app.calc_namelist import OrdersParser
+from app.forms import CalcForm
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    form = CalcForm()
+    return render_template("index.html", form=form)
 
 
-@app.route("/orders", methods=["POST"])
+@app.route("/orders", methods=['GET', 'POST'])
 def orders():
-    price = float(request.form.get('price', 88))
-    classes = None
+    calcform = CalcForm()
 
-    with open('temp.txt','w') as f:
-        if request.form.get('mclass') == "True":
-            classes_txt = request.form.get('classes')
-            classes = [x.split() for x in classes_txt.splitlines()]
-        orderparser = calc.OrdersParser(price=price, classes=classes, file=f)
-        _, nok, descr, order_table, summary, headers = orderparser.parse_namelist(request.form.get("order_txt"))
-    
-    with open('temp.txt','r') as f:
-        outputs=f.read()
+    if calcform.validate_on_submit():
+        price = float(calcform.price.data)
+        classes = None
 
-    return render_template("orders.html", descr=descr, errs=nok, order_table=order_table, outputs=outputs, summary=summary, headers=headers)
+        with open('temp.txt','w') as f:
+            if calcform.mclass.data:
+                classes_txt = calcform.classtxt.data
+                classes = [x.split() for x in classes_txt.splitlines()]
+            orderparser = OrdersParser(price=price, classes=classes, file=f)
+            _, nok, descr, order_table, summary, headers = orderparser.parse_namelist(calcform.ordertxt.data)
+        
+        with open('temp.txt','r') as f:
+            outputs=f.read()
+        
+        session['nok'] = nok
+        session['descr'] = descr
+        session['order_table'] = order_table
+        session['summary'] = summary
+        session['headers'] = headers
+        session['outputs'] = outputs
+
+        return redirect(url_for('orders'))
+
+    return render_template("orders.html", 
+        descr=session['descr'], 
+        errs=session['nok'], 
+        order_table=session['order_table'], 
+        outputs=session['outputs'], 
+        summary=session['summary'], 
+        headers=session['headers'])
