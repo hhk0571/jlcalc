@@ -6,6 +6,7 @@ import re
 import sys
 import textwrap
 import numpy as np
+import functools
 
 
 class OrdersParser(object):
@@ -13,6 +14,7 @@ class OrdersParser(object):
         self.price = price
         self.classes = classes
         self.file = file
+        self.fprint = functools.partial(print, file=file)
 
     def load_list(self, orders_txt):
         '''load names list from raw string
@@ -203,40 +205,39 @@ class OrdersParser(object):
         else:
             orders, nok, headers = self.single_class_parse(names_list, self.price)
 
-        print(descr, file=self.file)
-
-        print(headers)
-        for order in orders:
-            print(order)
-
+        self.fprint(descr)
         self.print_excel_fmt(headers, orders, self.price)
 
         order_table = self.make_order_table(headers, orders)
-        print('Order Tables', file=self.file)
-        print('-'*80, file=self.file)
+        self.fprint('Order Tables')
+        self.fprint('-'*80)
         for order in order_table:
-            print(order, file=self.file)
+            self.fprint(order)
 
         if nok:
             # print('\nWARNING: following lines were not parsed successfully!')
-            print('\n警告: 下列行无法正确解析', file=self.file)
-            print('='*50, file=self.file)
+            self.fprint('\n警告: 下列行无法正确解析')
+            self.fprint('='*50)
             for elem in nok:
-                print(elem, file=self.file)
-            print('='*50, file=self.file)
-            print('共发现 %d 个错误, 请人工校对!' % len(nok), file=self.file)
+                self.fprint(elem)
+            self.fprint('='*50)
+            self.fprint('共发现 %d 个错误, 请人工校对!' % len(nok))
         
         amount_array = np.array([x[2:] for x in orders])
         line_sum = np.c_[amount_array, np.sum(amount_array * self.price, axis=1)]
         summary = np.sum(line_sum, axis=0)
         summary = np.hstack((len(orders), summary))
         summary = summary.tolist()
-        print('-'*80, file=self.file)
-        print('Summary:', file=self.file)
+
+        for i in range(len(summary)-1):
+            summary[i] = int(summary[i])
+
+        self.fprint('-'*80)
+        self.fprint('Summary:')
         summary_header = ['人数'] + headers[2:] + ['总金额']
-        print(summary_header, file=self.file)
-        print(summary, file=self.file)
-        print('-'*80, file=self.file)
+        self.fprint(summary_header)
+        self.fprint(summary)
+        self.fprint('-'*80)
 
         return orders, nok, descr, order_table, summary, summary_header
 
@@ -275,20 +276,20 @@ class OrdersParser(object):
         for row, order in enumerate(orders,start=1):
             excel_fmt_list.append([str(row), '"'+order[1]+'"'] + [str(x) for x in order[2:]] + ['"=SUM(%s%d:%s%d)*$A$2"' % (columns[0],row+3, columns[-1], row+3), '"'+order[0]+'"'])
 
-        print('-'*80, file=self.file)
+        self.fprint('-'*80)
         for line in excel_fmt_list:
-            print(' '.join(line), file=self.file)
-        print('-'*80, file=self.file)
+            self.fprint(' '.join(line))
+        self.fprint('-'*80)
 
 
 def set_io_utf8():
     import sys, io
     if str.lower(sys.stdout.encoding) != 'utf-8':
-        print('change stdout encoding from %s to utf-8' % sys.stdout.encoding)
+        # print('change stdout encoding from %s to utf-8' % sys.stdout.encoding)
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     if str.lower(sys.stdin.encoding) != 'utf-8':
-        print('change stdin encoding from %s to utf-8' % sys.stdin.encoding)
+        # print('change stdin encoding from %s to utf-8' % sys.stdin.encoding)
         sys.stdin = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
 
 
