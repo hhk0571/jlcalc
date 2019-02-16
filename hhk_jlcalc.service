@@ -1,0 +1,10 @@
+[Unit]
+Description=Calculate Jielong Web App 
+[Service]
+Type=simple
+WorkingDirectory=/mnt/disk/projects/jlcalc/
+ExecStart=/mnt/disk/projects/jlcalc/venv/bin/gunicorn -b 0.0.0.0:8001 -w 4 jlcalc:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
