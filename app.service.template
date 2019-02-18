@@ -1,0 +1,10 @@
+[Unit]
+Description=%(APP_DESCRIPTION)s
+[Service]
+Type=simple
+WorkingDirectory=%(APP_DIR)s
+ExecStart=%(APP_DIR)s/venv/bin/gunicorn -b %(APP_BIND_IP)s:%(APP_PORT)d -w %(APP_WORKERS)d main:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
