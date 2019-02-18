@@ -19,14 +19,14 @@ def orders():
         price = float(calcform.price.data)
         classes = None
 
-        with open('temp.txt','w') as f:
+        with open('temp.txt','w', encoding='utf-8') as f:
             if calcform.mclass.data:
                 classes_txt = calcform.classtxt.data
                 classes = [x.split() for x in classes_txt.splitlines()]
             orderparser = OrdersParser(price=price, classes=classes, file=f)
             _, nok, descr, order_table, summary, headers = orderparser.parse_namelist(calcform.ordertxt.data)
         
-        with open('temp.txt','r') as f:
+        with open('temp.txt','r', encoding='utf-8') as f:
             outputs=f.read()
         
         session['nok'] = nok
