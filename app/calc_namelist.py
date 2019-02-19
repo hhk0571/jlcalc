@@ -190,6 +190,8 @@ class OrdersParser(object):
                 name, class_num = self.parse_classes(line, numbers) # 获取各个类别的数量
                 if sum(class_num.values()) == 0: # sum == 0 means wrong format
                     nok_list.append(orig_line)
+                elif len(class_num) != len(numbers): # classes missmatch
+                    nok_list.append(orig_line)
                 else:
                     orders.append([orig_line, name] + [class_num.get(x, 0) for x in cls_labels])
             else: # no number means wrong format
