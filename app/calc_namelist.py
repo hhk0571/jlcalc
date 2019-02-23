@@ -211,6 +211,7 @@ class OrdersParser(object):
         self.print_excel_fmt(headers, orders, self.price)
 
         order_table = self.make_order_table(headers, orders)
+        self.save_as_csv(headers, orders)
         self.fprint('Order Tables')
         self.fprint('-'*80)
         for order in order_table:
@@ -225,14 +226,17 @@ class OrdersParser(object):
             self.fprint('='*50)
             self.fprint('共发现 %d 个错误, 请人工校对!' % len(nok))
         
-        amount_array = np.array([x[2:] for x in orders])
-        line_sum = np.c_[amount_array, np.sum(amount_array * self.price, axis=1)]
-        summary = np.sum(line_sum, axis=0)
-        summary = np.hstack((len(orders), summary))
-        summary = summary.tolist()
+        if orders:
+            amount_array = np.array([x[2:] for x in orders])
+            line_sum = np.c_[amount_array, np.sum(amount_array * self.price, axis=1)]
+            summary = np.sum(line_sum, axis=0)
+            summary = np.hstack((len(orders), summary))
+            summary = summary.tolist()
 
-        for i in range(len(summary)-1):
-            summary[i] = int(summary[i])
+            for i in range(len(summary)-1):
+                summary[i] = int(summary[i])
+        else:
+            summary = []
 
         self.fprint('-'*80)
         self.fprint('Summary:')
@@ -244,8 +248,8 @@ class OrdersParser(object):
         return orders, nok, descr, order_table, summary, summary_header
 
     def make_order_table(self, headers, orders):
-        if orders is None:
-            return None
+        if not orders:
+            return []
 
         line_sum = np.sum(np.array([x[2:] for x in orders]), axis=1) * self.price
 
@@ -255,6 +259,23 @@ class OrdersParser(object):
             order_table.append(order[1:]+[subtot]+[order[0]])
         
         return order_table
+
+
+    def save_as_csv(self, headers, orders):
+        if not orders:
+            return []
+
+        cls_labels = headers[2:]
+        order_table = [['姓名'] + cls_labels + ['原始信息']]
+        for order in orders:
+            order_table.append(order[1:]+[order[0]])
+        
+        import csv
+
+        with open('out.csv', 'w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(order_table)
+        
 
 
     def print_excel_fmt(self, headers, orders, price):
