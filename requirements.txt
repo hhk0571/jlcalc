@@ -4,7 +4,7 @@ Flask-WTF==0.14.2
 gunicorn==19.9.0
 itsdangerous==1.1.0
 MarkupSafe==1.1.0
-numpy==1.16.1
+numpy==1.22.0
 python-dotenv==0.10.1
 WTForms==2.2.1
 werkzeug==0.14.1
